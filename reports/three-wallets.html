@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三个钱包 · 交易进化史 | Polymarket 深度复盘</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #07070f;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+    line-height: 1.7;
+  }
+
+  .page { max-width: 800px; margin: 0 auto; padding: 60px 24px 100px; }
+
+  /* ── Header ── */
+  .header { margin-bottom: 56px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #0a0a18; border: 1px solid #1e1e3a;
+    border-radius: 20px; padding: 5px 16px;
+    font-size: 11px; color: #818cf8; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: #818cf8; animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  h1 { font-size: 34px; font-weight: 900; color: #f8fafc; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 12px; }
+  .header-sub { font-size: 15px; color: #4b5563; line-height: 1.6; max-width: 600px; }
+
+  /* ── Timeline nav ── */
+  .timeline-nav {
+    display: flex; gap: 0; margin-bottom: 48px;
+    border: 1px solid #1a1a2e; border-radius: 14px; overflow: hidden;
+  }
+  .tn-item {
+    flex: 1; padding: 16px 20px; text-align: center;
+    border-right: 1px solid #1a1a2e; cursor: default;
+  }
+  .tn-item:last-child { border-right: none; }
+  .tn-phase { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+  .tn-label { font-size: 13px; font-weight: 700; }
+  .tn-pnl { font-size: 18px; font-weight: 800; margin-top: 4px; }
+  .tn-item.w1 { background: #080f0b; }
+  .tn-item.w1 .tn-phase { color: #16a34a; }
+  .tn-item.w1 .tn-label { color: #4ade80; }
+  .tn-item.w1 .tn-pnl { color: #4ade80; }
+  .tn-item.w2 { background: #0f0808; }
+  .tn-item.w2 .tn-phase { color: #dc2626; }
+  .tn-item.w2 .tn-label { color: #f87171; }
+  .tn-item.w2 .tn-pnl { color: #f87171; }
+  .tn-item.w3 { background: #08090f; }
+  .tn-item.w3 .tn-phase { color: #6366f1; }
+  .tn-item.w3 .tn-label { color: #a78bfa; }
+  .tn-item.w3 .tn-pnl { color: #a78bfa; }
+  .tn-arrow { display: flex; align-items: center; padding: 0 12px; color: #374151; font-size: 18px; }
+
+  /* ── Big insight box ── */
+  .insight-box {
+    background: linear-gradient(135deg, #0d1117, #0f1528);
+    border: 1px solid #1e3a5f; border-radius: 18px;
+    padding: 28px 32px; margin-bottom: 48px;
+    position: relative; overflow: hidden;
+  }
+  .insight-box::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #4ade80, #3b82f6, #8b5cf6);
+  }
+  .insight-tag { font-size: 11px; color: #60a5fa; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  .insight-text { font-size: 16px; color: #cbd5e1; line-height: 1.8; }
+  .insight-text strong { color: #fff; }
+
+  /* ── Section ── */
+  .section { margin-bottom: 52px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 24px; padding-bottom: 12px;
+    border-bottom: 1px solid #0f172a;
+  }
+  .section-num {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; flex-shrink: 0;
+  }
+  .sn-green { background: #052e16; color: #4ade80; }
+  .sn-red   { background: #450a0a; color: #f87171; }
+  .sn-blue  { background: #082044; color: #60a5fa; }
+  .sn-purple{ background: #1e1040; color: #a78bfa; }
+  .sn-gray  { background: #111827; color: #9ca3af; }
+  .section-title-text { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+  .section-title-sub { font-size: 12px; color: #4b5563; }
+
+  /* ── Wallet card ── */
+  .wallet-card {
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 16px;
+    border: 1px solid;
+  }
+  .wc-green { background: #06110a; border-color: #0f2a18; }
+  .wc-red   { background: #110606; border-color: #2a0f0f; }
+  .wc-purple{ background: #08070f; border-color: #1e1a3a; }
+
+  .wc-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .wc-title { font-size: 14px; font-weight: 800; }
+  .wc-addr { font-size: 11px; font-family: monospace; margin-top: 3px; color: #374151; }
+  .wc-pnl { font-size: 28px; font-weight: 900; letter-spacing: -0.02em; text-align: right; }
+
+  .wc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .wc-stat { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px 14px; }
+  .wc-stat-label { font-size: 10px; color: #4b5563; margin-bottom: 5px; }
+  .wc-stat-value { font-size: 18px; font-weight: 700; }
+
+  .c-green  { color: #4ade80; }
+  .c-red    { color: #f87171; }
+  .c-yellow { color: #fbbf24; }
+  .c-orange { color: #fb923c; }
+  .c-blue   { color: #60a5fa; }
+  .c-purple { color: #a78bfa; }
+  .c-gray   { color: #6b7280; }
+  .c-white  { color: #f8fafc; }
+
+  /* ── Comparison table ── */
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th {
+    text-align: center; padding: 10px 14px;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #4b5563; border-bottom: 1px solid #0f172a; font-weight: 600;
+  }
+  .compare-table th:first-child { text-align: left; }
+  .compare-table td { padding: 10px 14px; border-bottom: 1px solid #0d0d18; text-align: center; }
+  .compare-table td:first-child { text-align: left; color: #94a3b8; font-size: 12px; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .best { font-weight: 700; }
+
+  /* ── Insight item ── */
+  .insight-item {
+    display: flex; gap: 16px; margin-bottom: 16px;
+    padding: 18px 20px; border-radius: 14px; border: 1px solid;
+    align-items: flex-start;
+  }
+  .ii-danger { background: #0d0808; border-color: #1a0f0f; }
+  .ii-warn   { background: #0d0b08; border-color: #1a1608; }
+  .ii-success{ background: #080d0a; border-color: #0f1a12; }
+  .ii-info   { background: #08090f; border-color: #10111e; }
+  .ii-special{ background: #0a0810; border-color: #1a1030; }
+
+  .ii-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .ii-body { flex: 1; }
+  .ii-title { font-size: 14px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+  .ii-desc { font-size: 13px; color: #94a3b8; line-height: 1.7; }
+  .ii-desc strong { color: #e2e8f0; }
+
+  .ii-badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
+    letter-spacing: 0.05em; margin-bottom: 8px;
+  }
+  .badge-red    { background: #450a0a; color: #f87171; }
+  .badge-green  { background: #052e16; color: #4ade80; }
+  .badge-yellow { background: #451a03; color: #fbbf24; }
+  .badge-purple { background: #1e0a4a; color: #a78bfa; }
+  .badge-blue   { background: #082044; color: #60a5fa; }
+
+  /* ── Chart-like bars ── */
+  .evolution-chart { margin: 20px 0; }
+  .ev-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .ev-label { font-size: 11px; color: #4b5563; width: 80px; flex-shrink: 0; }
+  .ev-track { flex: 1; background: #0a0a14; border-radius: 4px; height: 10px; overflow: hidden; }
+  .ev-fill { height: 100%; border-radius: 4px; }
+  .ev-val { font-size: 12px; font-weight: 700; width: 60px; text-align: right; flex-shrink: 0; }
+  .fill-green  { background: linear-gradient(90deg, #14532d, #16a34a); }
+  .fill-red    { background: linear-gradient(90deg, #7f1d1d, #dc2626); }
+  .fill-yellow { background: linear-gradient(90deg, #78350f, #d97706); }
+  .fill-blue   { background: linear-gradient(90deg, #1e3a8a, #3b82f6); }
+  .fill-purple { background: linear-gradient(90deg, #3b0764, #7c3aed); }
+
+  /* ── Special callout ── */
+  .callout {
+    background: #0a070f; border: 1px solid #2d1a5a;
+    border-radius: 14px; padding: 20px 24px; margin: 16px 0;
+  }
+  .callout-title { font-size: 12px; font-weight: 700; color: #a78bfa; margin-bottom: 10px; letter-spacing: 0.05em; }
+  .callout-body { font-size: 13px; color: #94a3b8; line-height: 1.8; }
+  .callout-body strong { color: #c4b5fd; }
+
+  /* ── Action plan ── */
+  .action-list { counter-reset: action; }
+  .action-item {
+    display: flex; gap: 16px; margin-bottom: 14px;
+    padding: 18px 20px; background: #080810; border: 1px solid #141428;
+    border-radius: 14px; align-items: flex-start;
+  }
+  .action-num {
+    width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800;
+  }
+  .an-now    { background: #2d0a0a; color: #f87171; }
+  .an-week   { background: #2d1a0a; color: #fbbf24; }
+  .an-month  { background: #0a2d14; color: #4ade80; }
+  .an-long   { background: #1a0a2d; color: #a78bfa; }
+  .action-content { flex: 1; }
+  .action-title { font-size: 14px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+  .action-desc { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+  .action-desc strong { color: #e2e8f0; }
+
+  /* ── Formula ── */
+  .formula {
+    background: #060610; border: 1px solid #141428; border-radius: 12px;
+    padding: 18px 22px; font-family: 'SF Mono', monospace; font-size: 13px;
+    color: #64748b; line-height: 2; margin: 14px 0;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 60px; padding-top: 24px; border-top: 1px solid #0f172a;
+    font-size: 11px; color: #1f2937; text-align: center; line-height: 2;
+  }
+  .footer a { color: #374151; }
+
+  @media (max-width: 560px) {
+    h1 { font-size: 26px; }
+    .page { padding: 40px 16px 60px; }
+    .wc-grid { grid-template-columns: repeat(2, 1fr); }
+    .timeline-nav { flex-direction: column; }
+    .tn-arrow { display: none; }
+    .compare-table { font-size: 12px; }
+    .compare-table td, .compare-table th { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="eyebrow">
+      <div class="eyebrow-dot"></div>
+      三阶段进化复盘 · Polymarket
+    </div>
+    <h1>我的交易进化史</h1>
+    <div class="header-sub">
+      跨越三个钱包、三个阶段的完整交易行为分析——<br>
+      找出亏损根因，识别真实优势，规划下一步改进路径。
+    </div>
+  </div>
+
+  <!-- Timeline Nav -->
+  <div class="timeline-nav">
+    <div class="tn-item w1">
+      <div class="tn-phase">阶段一 · 钱包1</div>
+      <div class="tn-label">早期探索期</div>
+      <div class="tn-pnl">+$4,825</div>
+    </div>
+    <div class="tn-arrow">→</div>
+    <div class="tn-item w2">
+      <div class="tn-phase">阶段二 · 钱包2</div>
+      <div class="tn-label">崩溃重挫期</div>
+      <div class="tn-pnl">-$930</div>
+    </div>
+    <div class="tn-arrow">→</div>
+    <div class="tn-item w3">
+      <div class="tn-phase">阶段三 · 钱包3</div>
+      <div class="tn-label">恢复调整期</div>
+      <div class="tn-pnl">+$599</div>
+    </div>
+  </div>
+
+  <!-- Core Insight -->
+  <div class="insight-box">
+    <div class="insight-tag">📖 贯穿三阶段的核心发现</div>
+    <div class="insight-text">
+      钱包1数据显示的是 <strong>+$4,825 盈利、99% 盈利时间</strong>——你其实曾经有过真实的、结构性的套利优势（综合价格仅 $0.78）。<br><br>
+      但你没有意识到这个优势，转到钱包2后，胜率从 <strong>66.7% 崩溃到 26.7%</strong>，这才是真正的转折点。<br><br>
+      钱包3正在走向恢复，但<strong>输大赢小</strong>的根本问题仍未解决——这是你当前唯一需要集中突破的课题。
+    </div>
+  </div>
+
+  <!-- ── 01 三钱包数据对比 ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num sn-blue">01</div>
+      <div>
+        <div class="section-title-text">三个钱包完整数据对比</div>
+        <div class="section-title-sub">同维度横向比较，看清每个阶段的变化</div>
+      </div>
+    </div>
+
+    <!-- Wallet 1 -->
+    <div class="wallet-card wc-green">
+      <div class="wc-header">
+        <div>
+          <div class="wc-title c-green">🟢 钱包1 · 阶段一 · 早期探索</div>
+          <div class="wc-addr">0xc6c3851242b00663976948697149967832701AB9</div>
+        </div>
+        <div class="wc-pnl c-green">+$4,825</div>
+      </div>
+      <div class="wc-grid">
+        <div class="wc-stat">
+          <div class="wc-stat-label">胜率</div>
+          <div class="wc-stat-value c-green">66.7%</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">盈利时间占比</div>
+          <div class="wc-stat-value c-green">99%</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">套利优势</div>
+          <div class="wc-stat-value c-green">$0.78 ✅</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">平均盈利/笔</div>
+          <div class="wc-stat-value c-yellow">+$32.7</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">平均亏损/笔</div>
+          <div class="wc-stat-value c-red">-$36.3</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">最大回撤</div>
+          <div class="wc-stat-value c-green">3.5%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wallet 2 -->
+    <div class="wallet-card wc-red">
+      <div class="wc-header">
+        <div>
+          <div class="wc-title c-red">🔴 钱包2 · 阶段二 · 崩溃重挫</div>
+          <div class="wc-addr">0xe5fe5533f05e62F7938A322e514BEe46D167c03D</div>
+        </div>
+        <div class="wc-pnl c-red">-$930</div>
+      </div>
+      <div class="wc-grid">
+        <div class="wc-stat">
+          <div class="wc-stat-label">胜率</div>
+          <div class="wc-stat-value c-red">26.7%</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">盈利时间占比</div>
+          <div class="wc-stat-value c-red">0%</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">套利优势</div>
+          <div class="wc-stat-value c-red">$1.02 ❌</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">平均盈利/笔</div>
+          <div class="wc-stat-value c-yellow">+$11.8</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">平均亏损/笔</div>
+          <div class="wc-stat-value c-red">-$25.5</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">最大回撤</div>
+          <div class="wc-stat-value c-red">15.4%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wallet 3 -->
+    <div class="wallet-card wc-purple">
+      <div class="wc-header">
+        <div>
+          <div class="wc-title c-purple">🟣 钱包3 · 阶段三 · 恢复调整</div>
+          <div class="wc-addr">0x01B8F38d549D153C2a193C36C1E74C0120E782c1</div>
+        </div>
+        <div class="wc-pnl c-purple">+$599</div>
+      </div>
+      <div class="wc-grid">
+        <div class="wc-stat">
+          <div class="wc-stat-label">胜率</div>
+          <div class="wc-stat-value c-purple">84.9%</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">盈利时间占比</div>
+          <div class="wc-stat-value c-yellow">41.5%</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">套利优势</div>
+          <div class="wc-stat-value c-gray">$1.00 —</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">平均盈利/笔</div>
+          <div class="wc-stat-value c-yellow">+$23.1</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">平均亏损/笔</div>
+          <div class="wc-stat-value c-red">-$55.2</div>
+        </div>
+        <div class="wc-stat">
+          <div class="wc-stat-label">最大回撤</div>
+          <div class="wc-stat-value c-green">2.9%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compare table -->
+    <div style="overflow-x:auto;margin-top:20px;">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="text-align:left">指标</th>
+          <th style="color:#4ade80">钱包1</th>
+          <th style="color:#f87171">钱包2</th>
+          <th style="color:#a78bfa">钱包3</th>
+          <th>趋势</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>总盈亏</td>
+          <td class="c-green best">+$4,825</td>
+          <td class="c-red">-$930</td>
+          <td class="c-purple">+$599</td>
+          <td class="c-yellow">↑ 恢复中</td>
+        </tr>
+        <tr>
+          <td>胜率</td>
+          <td class="c-green">66.7%</td>
+          <td class="c-red">26.7%</td>
+          <td class="c-purple best">84.9%</td>
+          <td class="c-green">↑↑ 大幅提升</td>
+        </tr>
+        <tr>
+          <td>盈利时间占比</td>
+          <td class="c-green best">99%</td>
+          <td class="c-red">0%</td>
+          <td class="c-yellow">41.5%</td>
+          <td class="c-yellow">↑ 改善但未达标</td>
+        </tr>
+        <tr>
+          <td>平均盈利/笔</td>
+          <td class="c-green best">+$32.7</td>
+          <td class="c-red">+$11.8</td>
+          <td class="c-yellow">+$23.1</td>
+          <td class="c-yellow">↑ 恢复中</td>
+        </tr>
+        <tr>
+          <td>平均亏损/笔</td>
+          <td class="c-green best">-$36.3</td>
+          <td class="c-yellow">-$25.5</td>
+          <td class="c-red">-$55.2</td>
+          <td class="c-red">↓ 恶化！</td>
+        </tr>
+        <tr>
+          <td>盈亏比</td>
+          <td class="c-green best">1 : 1.1</td>
+          <td class="c-red">1 : 2.2</td>
+          <td class="c-red">1 : 2.4</td>
+          <td class="c-red">↓ 持续恶化</td>
+        </tr>
+        <tr>
+          <td>最大回撤</td>
+          <td class="c-green best">3.5%</td>
+          <td class="c-red">15.4%</td>
+          <td class="c-green">2.9%</td>
+          <td class="c-green">↑ 回撤控制改善</td>
+        </tr>
+        <tr>
+          <td>单仓集中度</td>
+          <td class="c-green">4%</td>
+          <td class="c-yellow">7%</td>
+          <td class="c-red">8%</td>
+          <td class="c-red">↓ 集中度在增加</td>
+        </tr>
+        <tr>
+          <td>追价程度</td>
+          <td class="c-yellow">中等</td>
+          <td class="c-green best">低</td>
+          <td class="c-red">高</td>
+          <td class="c-red">↓ 钱包3反弹了</td>
+        </tr>
+        <tr>
+          <td>套利优势</td>
+          <td class="c-green best">$0.78 ✅</td>
+          <td class="c-red">$1.02 ❌</td>
+          <td class="c-gray">$1.00 —</td>
+          <td class="c-red">↓ 失去优势</td>
+        </tr>
+        <tr>
+          <td>交易量</td>
+          <td>1000 笔</td>
+          <td>126 笔</td>
+          <td>129 笔</td>
+          <td class="c-green">↓ 减少（更审慎）</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- ── 02 阶段一深度解析 ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num sn-green">02</div>
+      <div>
+        <div class="section-title-text">阶段一：你曾经有过真正的结构性优势</div>
+        <div class="section-title-sub">钱包1 · 66.7% 胜率 · +$4,825</div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-special">
+      <div class="ii-icon">🔬</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-purple">重要发现</div>
+        <div class="ii-title">套利优势：综合价格仅 $0.78</div>
+        <div class="ii-desc">
+          钱包1的 <strong>Edge Detection 检测到套利优势：综合均价 $0.78</strong>。这意味着在某些市场中，你同时持有 YES 和 NO 仓位，而总购入成本远低于 $1（理论上无论结果如何都能盈利）。<br><br>
+          这是预测市场中最高级的策略——很多人终其一生都没有发现这个机会。你当时可能是无意为之（比如对冲、或者价格不理性时双边买入），但它确实产生了真实利润。<br><br>
+          <strong>这就是为什么钱包1有 99% 盈利时间和 +$4,825 的核心原因。</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-warn">
+      <div class="ii-icon">⚠️</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-yellow">待解谜题</div>
+        <div class="ii-title">你说钱包1在亏损，但数据显示盈利</div>
+        <div class="ii-desc">
+          你描述钱包1"一直亏损"，但数据样本（最近1000笔）显示 <strong>+$4,825</strong>。可能的解释：<br><br>
+          ① <strong>最可能</strong>：钱包1历史超过1000笔，早期确实亏损，后来找到节奏转为盈利，但你在盈利阶段就已经放弃了它。<br>
+          ② 你对"亏损"的感知来自账面浮亏（未结算），而非已实现盈亏。<br>
+          ③ 某笔大额亏损的心理冲击远超数字本身，让你觉得"一直在亏"。<br><br>
+          <strong>结论：钱包1并不是一个失败的钱包，它有真实的优势——你放弃它可能是一个错误。</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 03 阶段二深度解析 ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num sn-red">03</div>
+      <div>
+        <div class="section-title-text">阶段二：胜率崩溃的真相</div>
+        <div class="section-title-sub">钱包2 · 26.7% 胜率 · -$930 · 仅126笔</div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-danger">
+      <div class="ii-icon">📉</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-red">核心崩溃</div>
+        <div class="ii-title">胜率从 66.7% 崩至 26.7%：发生了什么？</div>
+        <div class="ii-desc">
+          这是整个交易史中最关键的转折点。126 笔交易里，<strong>只有约 34 笔盈利</strong>，剩下 92 笔亏损。<br><br>
+          对比钱包1失去了什么：<br>
+          · 套利对冲策略消失（从 $0.78 → $1.02，超过理论值）<br>
+          · 仓位集中度上升（4% → 7%）<br>
+          · 平均盈利锐减（$32 → $12）<br><br>
+          <strong>推断</strong>：换钱包后，你开始做更激进的单方向押注（all-in YES 或 NO），而不再分散对冲。市场对赌的心理从"理性套利"变成了"方向博弈"。
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-warn">
+      <div class="ii-icon">💸</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-yellow">规模陷阱</div>
+        <div class="ii-title">仓位集中度上升带来的双重伤害</div>
+        <div class="ii-desc">
+          钱包2单仓最高集中度升至 <strong>7%</strong>，最大回撤也从 3.5% 飙升至 <strong>15.4%</strong>。<br><br>
+          这是两个问题同时叠加：胜率下降（更多输） × 单仓更大（每次输更多）= 复利式亏损加速。<br><br>
+          <strong>126笔交易的 -$930，平均每笔亏 $7.4——速度比钱包1的盈利快了很多。</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 04 阶段三深度解析 ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num sn-purple">04</div>
+      <div>
+        <div class="section-title-text">阶段三：方向对了，但新问题出现</div>
+        <div class="section-title-sub">钱包3 · 84.9% 胜率 · +$599 · 但盈亏比在恶化</div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-success">
+      <div class="ii-icon">🎯</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-green">真实进步</div>
+        <div class="ii-title">胜率 84.9% 是真实改善，不是运气</div>
+        <div class="ii-desc">
+          129 笔交易中赢了约 110 笔——这个数字对于 129 笔的样本而言，已经具备一定统计意义。<br><br>
+          你在选择"押什么"这件事上有了质的飞跃：更加审慎，交易次数大幅减少（1000 → 129），只在更有把握的时候出手。<br><br>
+          <strong>结论：你的市场判断能力在提升，这是核心竞争力，要保护它。</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-danger">
+      <div class="ii-icon">🚨</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-red">新危机</div>
+        <div class="ii-title">输时亏损越来越大：从 -$36 到 -$55</div>
+        <div class="ii-desc">
+          这是钱包3最危险的信号。平均每笔亏损从钱包1的 <strong>-$36</strong> 扩大到 <strong>-$55</strong>，扩大了 52%。<br><br>
+          盈亏比（赢/输额度比）：<br>
+          · 钱包1：$32.7 / $36.3 = <strong class="c-green">0.90（接近1:1，相当健康）</strong><br>
+          · 钱包2：$11.8 / $25.5 = <strong class="c-red">0.46</strong><br>
+          · 钱包3：$23.1 / $55.2 = <strong class="c-red">0.42（最差！）</strong><br><br>
+          胜率在提升，但每次输的时候输得更狠。<strong>如果胜率从 84.9% 回落到 65%（完全可能），当前的盈亏比会让账户迅速转亏。</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-warn">
+      <div class="ii-icon">📊</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-yellow">隐患</div>
+        <div class="ii-title">单仓集中度继续上升至 8%</div>
+        <div class="ii-desc">
+          三个钱包的单仓集中度：4% → 7% → <strong>8%</strong>，一路在涨。<br><br>
+          结合平均亏损 -$55 来看：如果一笔 8% 仓位的交易归零，单次损失会非常大。<br><br>
+          <strong>当前的高胜率正在给你一种"可以加大注"的错觉——但在盈亏比未修复之前，这是危险信号。</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 05 进化趋势图 ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num sn-blue">05</div>
+      <div>
+        <div class="section-title-text">关键指标进化趋势</div>
+        <div class="section-title-sub">一眼看清哪些在变好，哪些在变差</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px;">
+      <div style="font-size:12px;color:#4b5563;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em;">胜率演变</div>
+      <div class="evolution-chart">
+        <div class="ev-row">
+          <div class="ev-label c-green">钱包1</div>
+          <div class="ev-track"><div class="ev-fill fill-green" style="width:66.7%"></div></div>
+          <div class="ev-val c-green">66.7%</div>
+        </div>
+        <div class="ev-row">
+          <div class="ev-label c-red">钱包2</div>
+          <div class="ev-track"><div class="ev-fill fill-red" style="width:26.7%"></div></div>
+          <div class="ev-val c-red">26.7%</div>
+        </div>
+        <div class="ev-row">
+          <div class="ev-label c-purple">钱包3</div>
+          <div class="ev-track"><div class="ev-fill fill-purple" style="width:84.9%"></div></div>
+          <div class="ev-val c-purple">84.9%</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px;">
+      <div style="font-size:12px;color:#4b5563;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em;">平均亏损绝对值（越低越好）</div>
+      <div class="evolution-chart">
+        <div class="ev-row">
+          <div class="ev-label c-green">钱包1</div>
+          <div class="ev-track"><div class="ev-fill fill-green" style="width:36%"></div></div>
+          <div class="ev-val c-green">$36</div>
+        </div>
+        <div class="ev-row">
+          <div class="ev-label c-green">钱包2</div>
+          <div class="ev-track"><div class="ev-fill fill-yellow" style="width:25%"></div></div>
+          <div class="ev-val c-yellow">$25</div>
+        </div>
+        <div class="ev-row">
+          <div class="ev-label c-red">钱包3</div>
+          <div class="ev-track"><div class="ev-fill fill-red" style="width:55%"></div></div>
+          <div class="ev-val c-red">$55 ⚠️</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;color:#4b5563;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em;">单仓集中度（越低越好）</div>
+      <div class="evolution-chart">
+        <div class="ev-row">
+          <div class="ev-label c-green">钱包1</div>
+          <div class="ev-track"><div class="ev-fill fill-green" style="width:40%"></div></div>
+          <div class="ev-val c-green">4%</div>
+        </div>
+        <div class="ev-row">
+          <div class="ev-label c-yellow">钱包2</div>
+          <div class="ev-track"><div class="ev-fill fill-yellow" style="width:70%"></div></div>
+          <div class="ev-val c-yellow">7%</div>
+        </div>
+        <div class="ev-row">
+          <div class="ev-label c-red">钱包3</div>
+          <div class="ev-track"><div class="ev-fill fill-red" style="width:80%"></div></div>
+          <div class="ev-val c-red">8% ⚠️</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 06 需要规避的问题 ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num sn-red">06</div>
+      <div>
+        <div class="section-title-text">必须规避的问题</div>
+        <div class="section-title-sub">基于三阶段数据归因的核心风险</div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-danger">
+      <div class="ii-icon">❌</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-red">最高优先级</div>
+        <div class="ii-title">输大赢小的盈亏比越来越失控</div>
+        <div class="ii-desc">
+          三阶段的盈亏比从 <strong>1:1.1 → 1:2.2 → 1:2.4</strong>，持续恶化。在钱包3你赢了84.9%的交易，但每次输的钱是赢的 2.4 倍。<br><br>
+          一旦市场进入你不熟悉的阶段，胜率跌到 65%，当前盈亏比会让你的账户立刻回到亏损状态。<br><br>
+          <strong>立即行动：</strong>对当前钱包3的每一个持仓，设定止损价（入场价 × 65%），超出就无条件平仓。
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-danger">
+      <div class="ii-icon">❌</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-red">高优先级</div>
+        <div class="ii-title">单仓集中度在悄悄升高</div>
+        <div class="ii-desc">
+          你的单仓集中度从 4% → 7% → 8%，这意味着高胜率给了你"可以多押"的心理暗示。<br><br>
+          但在盈亏比未改善之前，每一个大仓位的失败，都会比之前更加"致命"。这是在高空走钢丝——胜率高的时候安全，一旦走偏代价极大。<br><br>
+          <strong>立即行动：</strong>把单仓上限硬性设为 3%，强信心也不超过 5%。等盈亏比恢复到 1:1.5 以内再讨论是否上调。
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-warn">
+      <div class="ii-icon">⚠️</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-yellow">中优先级</div>
+        <div class="ii-title">钱包3的追价问题重新出现</div>
+        <div class="ii-desc">
+          钱包2的追价程度是"低"（入场质量在三个钱包里最好），但钱包3追价评级又回到了"高"，价格偏差高达 2999 bps（约30%）。<br><br>
+          追价意味着你总是在"好消息出来后"才入场，那时候回报率已经大幅压缩，风险/收益比已经不合算。<br><br>
+          <strong>行动：</strong>钱包2有一件事做对了——低追价。复盘钱包2的具体入场时机，看看为什么那个阶段入场更早。
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-warn">
+      <div class="ii-icon">⚠️</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-yellow">长期风险</div>
+        <div class="ii-title">丢失了钱包1的套利边际优势</div>
+        <div class="ii-desc">
+          钱包1的综合价格 $0.78 是真实的结构性优势，来自于在同一市场买了 YES 和 NO，总成本低于 $1。<br><br>
+          这个策略在预测市场流动性差时很有效——市场定价不理性，两边的总价格可能只有 $0.80，这时候无论哪边赢你都是赚的。<br><br>
+          钱包2和3完全没有这种操作（综合均价 $1.02 和 $1.00），你变成了纯粹的方向博弈者，而放弃了一个可以稳定获利的策略。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 07 值得发扬的优势 ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num sn-green">07</div>
+      <div>
+        <div class="section-title-text">值得保护和发扬的优势</div>
+        <div class="section-title-sub">这些是你真实存在的 alpha，要继续强化</div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-success">
+      <div class="ii-icon">✅</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-green">核心优势</div>
+        <div class="ii-title">钱包3的胜率 84.9% 是真正的选股能力</div>
+        <div class="ii-desc">
+          在 129 笔交易中赢了 110 笔，这不是偶然——你对"要不要押这个事件"的判断越来越准确。<br><br>
+          更关键的是：交易次数大幅减少（从1000笔 → 129笔），说明你开始"只出高质量的牌"，而不是什么都买。这是思维升级的体现。<br><br>
+          <strong>如何放大：</strong>继续保持这个选择性，同时把"输了为什么输"写下来，帮助进一步提升胜率。
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-success">
+      <div class="ii-icon">✅</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-green">回撤控制</div>
+        <div class="ii-title">钱包3的回撤控制已经恢复到健康水平</div>
+        <div class="ii-desc">
+          最大回撤从钱包2的 <strong>15.4%</strong> 回落到钱包3的 <strong>2.9%</strong>——几乎回到了钱包1的水平（3.5%）。<br><br>
+          这说明你在整体仓位管理上变得更加谨慎，没有出现大开大合的爆仓式回撤，账户本金得到了很好的保护。<br><br>
+          <strong>这个优势能支撑你慢慢把盈亏比调回来——因为本金还在。</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-item ii-success">
+      <div class="ii-icon">✅</div>
+      <div class="ii-body">
+        <div class="ii-badge badge-green">心理成熟</div>
+        <div class="ii-title">三阶段显示出在逆境后重建的能力</div>
+        <div class="ii-desc">
+          钱包2的崩溃（26.7% 胜率）没有让你就此退出，而是重新建立了钱包3并回到盈利。<br><br>
+          大多数散户在经历这种级别的失败后会直接离场，或者越亏越赌。你选择了换钱包、缩小规模、重新积累——这是正确的应对方式。<br><br>
+          <strong>继续保持这种"输了重建"而非"越亏越大"的心态，这是长期生存的核心素质。</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 08 行动路线图 ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num sn-purple">08</div>
+      <div>
+        <div class="section-title-text">下一步行动路线图</div>
+        <div class="section-title-sub">按优先级排列，聚焦最重要的改变</div>
+      </div>
+    </div>
+
+    <div class="action-list">
+      <div class="action-item">
+        <div class="action-num an-now">今</div>
+        <div class="action-content">
+          <div class="action-title">设定止损并检查现有仓位</div>
+          <div class="action-desc">
+            检查钱包3所有当前持仓，对每一个标记止损价（入场价 × 65%）。<br>
+            今天就把单仓上限规则写下来：<strong>普通仓位最多 2%，强信心最多 4%，绝对不超过 5%</strong>。
+          </div>
+        </div>
+      </div>
+
+      <div class="action-item">
+        <div class="action-num an-now">今</div>
+        <div class="action-content">
+          <div class="action-title">改变出场策略，让赢的仓位跑更久</div>
+          <div class="action-desc">
+            从今天起，盈利仓位的规则改为：<strong>盈利 50% 减仓一半，剩余持有到结算前 3-5 天</strong>。<br>
+            目标是把钱包3的平均盈利从 $23 提升到 $40+，让盈亏比从 1:2.4 改善到 1:1.5 以内。
+          </div>
+        </div>
+      </div>
+
+      <div class="action-item">
+        <div class="action-num an-week">周</div>
+        <div class="action-content">
+          <div class="action-title">复盘钱包2的具体失败交易</div>
+          <div class="action-desc">
+            钱包2的 26.7% 胜率说明有一批"质量很差的赌注"。试着回忆或查询那段时间押注了哪些主题——<strong>那些主题就是你最不擅长、应该永久回避的领域</strong>。
+          </div>
+        </div>
+      </div>
+
+      <div class="action-item">
+        <div class="action-num an-month">月</div>
+        <div class="action-content">
+          <div class="action-title">研究并尝试恢复钱包1的对冲策略</div>
+          <div class="action-desc">
+            钱包1的综合价格 $0.78 来自同一市场双边持仓（YES+NO 总价 &lt; $1）。<br>
+            <strong>每周扫描一次伊朗板块，寻找 YES+NO 总价低于 $0.90 的机会</strong>——这种机会出现时，双边买入，无论结果都能盈利。
+          </div>
+        </div>
+      </div>
+
+      <div class="action-item">
+        <div class="action-num an-long">远</div>
+        <div class="action-content">
+          <div class="action-title">专注深度研究领域，放弃泛泛而押</div>
+          <div class="action-desc">
+            胜率 84.9% 的背后，是你对某些特定类型事件的深度理解。<br>
+            <strong>找出你赢率最高的3-5类事件，把80%的资金集中在这些类型上</strong>，其他"看不懂但感觉有机会"的事件，控制在 0.5% 以内探索性仓位。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">💡 最后的核心洞见</div>
+      <div class="callout-body">
+        你的三个钱包合计盈亏：<strong>+$4,825 - $930 + $599 = +$4,494（整体仍是盈利！）</strong><br><br>
+        你不是一个"一直亏损的交易者"。你是一个有真实 alpha、但风险管理有待提升的交易者。<br>
+        <strong>胜率在提升、回撤在收缩、本金还在——现在是修复盈亏比的最好时机。</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    数据来源：Polymarket CLOB API · 分析框架：@thejayden "The Autopsy of a Polymarket Whale"<br>
+    钱包1: 1000笔样本 · 钱包2: 126笔 · 钱包3: 129笔<br>
+    <a href="https://polymarket.com/?r=serene77mc-g6kj">polymarket.com</a> · 仅供个人复盘参考，不构成任何投资建议
+  </div>
+
+</div>
+</body>
+</html>

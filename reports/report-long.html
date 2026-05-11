@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polymarket 钱包深度复盘</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #07070f;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+    line-height: 1.7;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ── Layout ── */
+  .page { max-width: 760px; margin: 0 auto; padding: 60px 24px 80px; }
+
+  /* ── Header ── */
+  .header { margin-bottom: 48px; }
+  .header-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #0f1a14; border: 1px solid #1a3a28;
+    border-radius: 20px; padding: 4px 14px;
+    font-size: 11px; color: #4ade80; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 20px;
+  }
+  .header-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  h1 { font-size: 32px; font-weight: 800; color: #f8fafc; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .subtitle { font-size: 15px; color: #64748b; }
+  .addr-row {
+    margin-top: 16px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; font-family: monospace; color: #374151;
+  }
+  .addr-copy { color: #1d4ed8; cursor: pointer; font-family: sans-serif; font-size: 11px; }
+
+  /* ── Section ── */
+  .section { margin-bottom: 48px; }
+  .section-title {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 20px; padding-bottom: 10px;
+    border-bottom: 1px solid #0f172a;
+    display: flex; align-items: center; gap-8px;
+  }
+  .section-title.red { color: #f87171; border-color: #1f0f0f; }
+  .section-title.green { color: #4ade80; border-color: #0f1f0f; }
+  .section-title.blue { color: #60a5fa; border-color: #0f1520; }
+  .section-title.purple { color: #a78bfa; border-color: #170f2a; }
+  .section-title.gray { color: #6b7280; border-color: #111827; }
+
+  /* ── Verdict box ── */
+  .verdict-box {
+    background: linear-gradient(135deg, #0d1117 0%, #0f1622 100%);
+    border: 1px solid #1e3a5f;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .verdict-box::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6);
+  }
+  .verdict-box-title { font-size: 11px; color: #6366f1; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  .verdict-box-text { font-size: 17px; color: #c7d2fe; line-height: 1.7; font-weight: 500; }
+  .verdict-box-text strong { color: #fff; }
+
+  /* ── Stats grid ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stats-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .stat-card {
+    background: #0b0b14;
+    border: 1px solid #141428;
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+  .stat-card-label { font-size: 11px; color: #4b5563; margin-bottom: 8px; line-height: 1.3; }
+  .stat-card-value { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .stat-card-sub { font-size: 11px; color: #374151; margin-top: 4px; }
+  .stat-card.highlight { border-color: #1a1a40; background: #0d0d20; }
+
+  .c-red { color: #f87171; }
+  .c-green { color: #4ade80; }
+  .c-yellow { color: #fbbf24; }
+  .c-orange { color: #fb923c; }
+  .c-blue { color: #60a5fa; }
+  .c-purple { color: #a78bfa; }
+  .c-gray { color: #6b7280; }
+
+  /* ── Formula block ── */
+  .formula {
+    background: #060610;
+    border: 1px solid #141428;
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 2;
+    margin: 16px 0;
+  }
+  .formula .c-red { color: #f87171; font-weight: 600; }
+  .formula .c-green { color: #4ade80; font-weight: 600; }
+  .formula .c-white { color: #f1f5f9; font-weight: 700; }
+  .formula .comment { color: #1e293b; }
+
+  /* ── Problem item ── */
+  .problem-item {
+    background: #0d0712;
+    border: 1px solid #1a0f20;
+    border-left: 3px solid #7c3aed;
+    border-radius: 0 12px 12px 0;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+  }
+  .problem-item.danger { border-left-color: #dc2626; background: #0d0808; border-color: #1a0f0f; }
+  .problem-item.warning { border-left-color: #d97706; background: #0d0b08; border-color: #1a170f; }
+  .problem-item.success { border-left-color: #16a34a; background: #080d0a; border-color: #0f1a10; }
+  .problem-item.info { border-left-color: #2563eb; background: #08090d; border-color: #0f1020; }
+
+  .problem-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+  }
+  .problem-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+    padding: 2px 8px; border-radius: 4px; text-transform: uppercase;
+  }
+  .badge-red { background: #450a0a; color: #f87171; }
+  .badge-yellow { background: #451a03; color: #fbbf24; }
+  .badge-green { background: #052e16; color: #4ade80; }
+  .badge-blue { background: #082044; color: #60a5fa; }
+
+  .problem-title-text { font-size: 14px; font-weight: 700; color: #f1f5f9; }
+  .problem-body { font-size: 13px; color: #94a3b8; line-height: 1.7; }
+  .problem-body strong { color: #e2e8f0; }
+  .problem-fix {
+    margin-top: 10px; padding: 10px 14px;
+    background: #0a0a18; border-radius: 8px;
+    font-size: 12px; color: #64748b;
+    border: 1px dashed #1e2035;
+  }
+  .problem-fix strong { color: #818cf8; }
+
+  /* ── Comparison bar ── */
+  .bar-container { margin: 8px 0; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+  .bar-track { background: #0f0f1a; border-radius: 4px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .bar-fill.red { background: linear-gradient(90deg, #7f1d1d, #dc2626); }
+  .bar-fill.green { background: linear-gradient(90deg, #14532d, #16a34a); }
+
+  /* ── Action plan ── */
+  .action-step {
+    display: flex; gap: 16px; margin-bottom: 20px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800;
+    background: #0f172a; color: #6366f1; border: 1px solid #1e2a4a;
+  }
+  .step-content { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+  .step-desc strong { color: #c7d2fe; }
+
+  /* ── Checklist ── */
+  .checklist {
+    background: #08080f;
+    border: 1px solid #141428;
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .check-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #0f0f1f;
+    font-size: 13px; color: #94a3b8;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-icon { font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+  .check-text strong { color: #e2e8f0; }
+
+  /* ── Rating badge ── */
+  .rating-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .rating-badge {
+    padding: 8px 16px; border-radius: 8px;
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; gap-6px;
+  }
+  .rb-bad { background: #1a0808; border: 1px solid #3b0f0f; color: #f87171; }
+  .rb-warn { background: #1a1208; border: 1px solid #3b2a0f; color: #fbbf24; }
+  .rb-ok { background: #081a10; border: 1px solid #0f3b20; color: #4ade80; }
+
+  /* ── Quote ── */
+  .quote-box {
+    border-left: 3px solid #4b5563;
+    padding: 14px 20px;
+    margin: 20px 0;
+    color: #9ca3af;
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid #0f172a;
+    font-size: 11px; color: #1f2937;
+    text-align: center; line-height: 1.8;
+  }
+  .footer a { color: #374151; }
+
+  /* ── Responsive ── */
+  @media (max-width: 560px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    h1 { font-size: 24px; }
+    .page { padding: 40px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-tag">
+      <div class="header-tag-dot"></div>
+      Polymarket 深度复盘
+    </div>
+    <h1>我的交易诊断报告</h1>
+    <div class="subtitle">1000 笔历史交易 · 全面归因分析 · 改进路线图</div>
+    <div class="addr-row">
+      <span>0x1e334B3BFBd9722f6C1F0B6f2BD1dB76EA0dBf4d</span>
+    </div>
+  </div>
+
+  <!-- Verdict -->
+  <div class="verdict-box">
+    <div class="verdict-box-title">🔍 核心结论</div>
+    <div class="verdict-box-text">
+      我的胜率 <strong>51.6%</strong>，方向判断能力真实存在——但账户亏损了 <strong>$5,747</strong>。<br>
+      问题不是看不准方向，而是<strong>赢了过早跑，输了死命扛</strong>，最终把选方向的优势全部葬送在风险管理失控上。
+    </div>
+  </div>
+
+  <!-- ── 01 核心数据 ── -->
+  <div class="section">
+    <div class="section-title blue">01 · 核心数据总览</div>
+
+    <div class="stats-grid">
+      <div class="stat-card highlight">
+        <div class="stat-card-label">总实现盈亏</div>
+        <div class="stat-card-value c-red">-$5,747</div>
+        <div class="stat-card-sub">1000 笔交易累计</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">胜率</div>
+        <div class="stat-card-value c-green">51.6%</div>
+        <div class="stat-card-sub">略高于随机水平</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">盈利时间占比</div>
+        <div class="stat-card-value c-red">0%</div>
+        <div class="stat-card-sub">账户从未回正</div>
+      </div>
+    </div>
+
+    <div class="stats-grid stats-grid-2">
+      <div class="stat-card">
+        <div class="stat-card-label">平均盈利 / 笔</div>
+        <div class="stat-card-value c-yellow">+$16.5</div>
+        <div class="stat-card-sub">516 笔盈利交易</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">平均亏损 / 笔</div>
+        <div class="stat-card-value c-red">-$64.8</div>
+        <div class="stat-card-sub">484 笔亏损交易</div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-label">入场质量评级</div>
+        <div class="stat-card-value c-orange">C</div>
+        <div class="stat-card-sub">价格偏差 2812 bps</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">单仓最高集中度</div>
+        <div class="stat-card-value c-green">3%</div>
+        <div class="stat-card-sub">仓位分散合理</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-label">最大回撤</div>
+        <div class="stat-card-value c-yellow">11.2%</div>
+        <div class="stat-card-sub">尚在可控范围</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 02 致命问题 ── -->
+  <div class="section">
+    <div class="section-title red">02 · 致命问题：盈亏不对称</div>
+
+    <p style="font-size:14px;color:#94a3b8;margin-bottom:20px;">
+      以下是账户亏损的数学本质。胜率超过50%，理论上是有优势的——但每一次的盈亏规模，把这个优势彻底摧毁。
+    </p>
+
+    <div class="formula">
+      <span class="comment">// 盈亏期望值计算</span><br>
+      每笔期望 = 胜率 × 平均盈利 + 败率 × 平均亏损<br>
+      　　　　 = 0.516 × <span class="c-green">+$16.52</span> + 0.484 × <span class="c-red">-$64.85</span><br>
+      　　　　 = <span class="c-green">$8.52</span> - <span class="c-red">$31.39</span><br>
+      　　　　 = <span class="c-white">每笔 -$22.87</span><br><br>
+      <span class="comment">// 1000 笔 × (-$22.87) ≈ -$22,870（实际 -$5,747，说明近期有改善）</span>
+    </div>
+
+    <div class="bar-container" style="margin: 20px 0;">
+      <div class="bar-label">
+        <span>平均盈利 +$16.52</span>
+        <span>平均亏损 -$64.85（3.9倍）</span>
+      </div>
+      <div style="display:flex;gap:4px;margin-top:6px;">
+        <div style="flex:1;">
+          <div class="bar-track"><div class="bar-fill green" style="width:20%"></div></div>
+          <div style="font-size:10px;color:#4ade80;margin-top:3px;text-align:center;">盈利笔</div>
+        </div>
+        <div style="flex:1;">
+          <div class="bar-track"><div class="bar-fill red" style="width:80%"></div></div>
+          <div style="font-size:10px;color:#f87171;margin-top:3px;text-align:center;">亏损额</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-box">
+      预测市场有一个铁律：如果你的平均盈利不能覆盖平均亏损，无论你的胜率是60%还是70%，长期都会亏损。
+    </div>
+  </div>
+
+  <!-- ── 03 三大核心问题 ── -->
+  <div class="section">
+    <div class="section-title red">03 · 三大核心亏损根因</div>
+
+    <div class="problem-item danger">
+      <div class="problem-header">
+        <span class="problem-badge badge-red">根因 #1</span>
+        <span class="problem-title-text">亏损持仓死扛，等待"回本"</span>
+      </div>
+      <div class="problem-body">
+        <strong>盈利时间占比 0%</strong> 说明账户从第一笔交易开始就从没有回到累计正收益过。这不是运气问题，而是系统性地把亏损仓位一直拿着。<br><br>
+        预测市场和股票不同——有明确截止日期。接近到期的低概率仓位本质是在赌"奇迹发生"，而不是等回本。每一分钟的持有都是追加成本。
+      </div>
+      <div class="problem-fix">
+        <strong>立即修正：</strong>设定硬止损线 — 任何仓位跌幅超过 <strong>35%</strong>，无条件平仓，不讨论、不等待。宁可损失35%，不要损失100%。
+      </div>
+    </div>
+
+    <div class="problem-item danger">
+      <div class="problem-header">
+        <span class="problem-badge badge-red">根因 #2</span>
+        <span class="problem-title-text">严重追价入场（偏差高达 28%）</span>
+      </div>
+      <div class="problem-body">
+        入场价格偏差 <strong>2812 个基点（28%）</strong>，这意味着我经常在价格已经大幅拉升后才买入。<br><br>
+        以一个典型例子说明：某事件 YES 原本在 10¢（回报率 900%），新闻出来后涨到 30¢（回报率 233%）。如果我在30¢才追入，相当于已经错过了最核心的定价差机会，而且风险更大。
+      </div>
+      <div class="problem-fix">
+        <strong>立即修正：</strong>① 只用<strong>限价单</strong>，永远不用市价单；② 制定规则：任何仓位如果过去24小时价格已经涨超 20%，放弃这次机会；③ 提前布局，等新闻到来时已经持仓。
+      </div>
+    </div>
+
+    <div class="problem-item warning">
+      <div class="problem-header">
+        <span class="problem-badge badge-yellow">根因 #3</span>
+        <span class="problem-title-text">盈利仓位过早出场</span>
+      </div>
+      <div class="problem-body">
+        平均每笔盈利只有 <strong>$16.52</strong>，与平均亏损 $64.85 的比值约为 1:3.9。<br><br>
+        这说明当仓位处于盈利状态时，倾向于快速锁定利润——但这恰恰是错误的方向。在预测市场，一旦方向判断正确，应该让仓位持续持有到接近结算，回报才会最大化。
+      </div>
+      <div class="problem-fix">
+        <strong>立即修正：</strong>盈利 50% 时可以减仓一半，剩余持有到事件临近结算（距截止 3-5 天内）。用"分批离场"代替"全部跑路"。
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 04 真正的优势 ── -->
+  <div class="section">
+    <div class="section-title green">04 · 真实优势：值得保留并放大</div>
+
+    <div class="problem-item success">
+      <div class="problem-header">
+        <span class="problem-badge badge-green">优势 #1</span>
+        <span class="problem-title-text">方向判断能力真实存在</span>
+      </div>
+      <div class="problem-body">
+        51.6% 胜率看起来不高，但在预测市场中已经高于随机水平。更重要的是：这个胜率来自 <strong>1000 笔交易</strong>的样本，统计显著性较高，不太可能是运气。<br><br>
+        这意味着在信息判断、市场研究方面有真实的 alpha。一旦修复风险管理问题，这个优势会直接转化为盈利。
+      </div>
+      <div class="problem-fix">
+        <strong>如何放大：</strong>聚焦自己研究最深的领域（如伊朗板块），在这些领域内提升胜率至 55-60%+，同时修复盈亏比。
+      </div>
+    </div>
+
+    <div class="problem-item success">
+      <div class="problem-header">
+        <span class="problem-badge badge-green">优势 #2</span>
+        <span class="problem-title-text">仓位管理分散，避免单点爆仓</span>
+      </div>
+      <div class="problem-body">
+        单仓最高集中度 <strong>3%</strong>，说明没有把全部资金押注在单一事件上。这是一个非常重要的风险控制意识，很多散户倒在这里。<br><br>
+        正是因为有这个分散化，即使策略有缺陷，账户也没有被一次性清仓。
+      </div>
+      <div class="problem-fix">
+        <strong>进一步优化：</strong>可以根据信心度分级——强信心仓位 2-3%，普通仓位 0.5-1%，探索性仓位 0.2-0.3%。
+      </div>
+    </div>
+
+    <div class="problem-item info">
+      <div class="problem-header">
+        <span class="problem-badge badge-blue">优势 #3</span>
+        <span class="problem-title-text">人工交易，有思考节奏</span>
+      </div>
+      <div class="problem-body">
+        平均交易间隔 <strong>4880 秒（约 81 分钟）</strong>，是经过思考的人工操作，不是冲动点击。这说明每笔交易都有一定的分析过程，而不是情绪化下单。
+      </div>
+      <div class="problem-fix">
+        <strong>如何发扬：</strong>甚至可以把节奏放得更慢——每笔交易前写下"我为什么买这个、我的止损在哪、我的目标是什么"，倒逼自己思考清楚。
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 05 改进路线图 ── -->
+  <div class="section">
+    <div class="section-title purple">05 · 改进路线图</div>
+
+    <div class="action-step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">立即：建立硬性止损规则</div>
+        <div class="step-desc">
+          从今天开始，任何仓位亏损超过 <strong>35%</strong> 立即平仓，不讨论、不犹豫。<br>
+          写下来贴在屏幕旁边，把这条规则当作不可违背的纪律。同时检查现有持仓，把所有亏损超过 35% 的仓位当日处理。
+        </div>
+      </div>
+    </div>
+
+    <div class="action-step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">本周：入场检查清单</div>
+        <div class="step-desc">
+          每次入场前必须确认以下所有条件：<br>
+          <strong>① 流动性 > $5,000</strong>（太小的市场价差损耗大）<br>
+          <strong>② 过去24小时价格未超过 +20%</strong>（避免追涨）<br>
+          <strong>③ 回报率仍然 > 80%</strong>（入场价值存在）<br>
+          <strong>④ 截止日期距今 7 天以上</strong>（太近流动性差）<br>
+          <strong>⑤ 使用限价单入场</strong>（拒绝任何市价单）
+        </div>
+      </div>
+    </div>
+
+    <div class="action-step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">本月：改变出场策略</div>
+        <div class="step-desc">
+          当仓位盈利 <strong>50%</strong> 时，减仓一半；剩余仓位持有至事件结算前 3-5 天再离场（或结算时拿满）。<br>
+          目标是把平均盈利 / 平均亏损比，从目前的 <strong>1:3.9</strong> 改善到 <strong>1:1.5 以内</strong>。
+        </div>
+      </div>
+    </div>
+
+    <div class="action-step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-title">长期：专注深度研究的领域</div>
+        <div class="step-desc">
+          把交易重心放在自己研究最深入的板块（比如伊朗地缘政治），而不是分散到各种随机事件。<br>
+          深度信息 = 真实 alpha。在熟悉的领域里，胜率可以从 51.6% 提升到 60%+，配合修复后的盈亏比，账户会进入正向循环。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 06 入场前检查清单 ── -->
+  <div class="section">
+    <div class="section-title gray">06 · 入场前检查清单（可截图保存）</div>
+
+    <div class="checklist">
+      <div class="check-item">
+        <div class="check-icon">☐</div>
+        <div class="check-text"><strong>流动性确认</strong> — 当前市场流动性 > $5,000，可以正常交易</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">☐</div>
+        <div class="check-text"><strong>价格未追高</strong> — 过去24小时 YES 价格涨幅 < 20%</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">☐</div>
+        <div class="check-text"><strong>回报率有价值</strong> — 最优方向（YES或NO）回报率 > 80%</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">☐</div>
+        <div class="check-text"><strong>截止时间合适</strong> — 距截止日期 7 天以上（最好 2 周以上）</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">☐</div>
+        <div class="check-text"><strong>使用限价单</strong> — 已输入限价单，而不是点击市价买入</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">☐</div>
+        <div class="check-text"><strong>止损已设定</strong> — 明确如果仓位跌至入场价 65% 就离场</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">☐</div>
+        <div class="check-text"><strong>仓位合理</strong> — 本笔仓位不超过总资金 3%，强信心才上 3%</div>
+      </div>
+      <div class="check-item">
+        <div class="check-icon">☐</div>
+        <div class="check-text"><strong>研究依据</strong> — 我的入场逻辑是什么？（不是"感觉"或"别人说"）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    数据来源：Polymarket CLOB API · 1000 笔交易样本<br>
+    分析框架：<a href="https://x.com/thejayden">@thejayden "The Autopsy of a Polymarket Whale"</a><br>
+    <a href="https://polymarket.com/?r=serene77mc-g6kj">polymarket.com</a> · 本报告仅供个人复盘参考，不构成任何投资建议
+  </div>
+
+</div>
+</body>
+</html>

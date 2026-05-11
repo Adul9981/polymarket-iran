@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polymarket 钱包复盘 · 简版</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: #111118;
+    border: 1px solid #1e1e2e;
+    border-radius: 20px;
+    padding: 36px 40px;
+    max-width: 560px;
+    width: 100%;
+    box-shadow: 0 0 60px rgba(0,255,128,0.04);
+  }
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
+  .label { font-size: 11px; color: #4b5563; letter-spacing: 0.1em; text-transform: uppercase; }
+  h1 { font-size: 22px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+  .addr { font-size: 12px; color: #4b5563; font-family: monospace; margin-bottom: 28px; }
+
+  .verdict {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 1px solid #2d2d4e;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .verdict-title { font-size: 11px; color: #6366f1; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .verdict-text { font-size: 15px; color: #c7d2fe; line-height: 1.6; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat {
+    background: #0f0f1a;
+    border: 1px solid #1e1e2e;
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .stat-label { font-size: 11px; color: #4b5563; margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .red { color: #f87171; }
+  .green { color: #4ade80; }
+  .yellow { color: #fbbf24; }
+  .purple { color: #a78bfa; }
+
+  .divider { border: none; border-top: 1px solid #1e1e2e; margin: 20px 0; }
+
+  .problem-title {
+    font-size: 11px; color: #f87171; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .problem {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .problem-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .problem-text { font-size: 13px; color: #94a3b8; line-height: 1.5; }
+  .problem-text strong { color: #e2e8f0; }
+
+  .strength-title {
+    font-size: 11px; color: #4ade80; letter-spacing: 0.08em;
+    text-transform: uppercase; margin: 20px 0 12px;
+  }
+
+  .formula {
+    background: #0d0d16;
+    border: 1px solid #1e1e2e;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: monospace;
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 16px 0;
+    line-height: 1.8;
+  }
+  .formula .highlight { color: #f87171; font-weight: 600; }
+  .formula .ok { color: #4ade80; }
+
+  .bottom {
+    margin-top: 24px;
+    font-size: 11px;
+    color: #374151;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .bottom a { color: #4b5563; text-decoration: none; }
+  .bottom a:hover { color: #6b7280; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-row">
+    <div class="dot"></div>
+    <span class="label">Polymarket 钱包复盘</span>
+  </div>
+
+  <h1>我的交易诊断</h1>
+  <div class="addr">0x1e334B3BFBd9722f6C1F0B6f2BD1dB76EA0dBf4d · 1000 笔交易样本</div>
+
+  <div class="verdict">
+    <div class="verdict-title">一句话结论</div>
+    <div class="verdict-text">
+      我有超过50%的正确率，却亏了 $5,747——<strong style="color:#fff">问题不是眼光，是纪律。</strong>赢了就跑、输了死扛，是一切亏损的根源。
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">总亏损</div>
+      <div class="stat-value red">-$5,747</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">胜率</div>
+      <div class="stat-value green">51.6%</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">平均盈利/笔</div>
+      <div class="stat-value yellow">+$16.5</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">平均亏损/笔</div>
+      <div class="stat-value red">-$64.8</div>
+    </div>
+  </div>
+
+  <div class="formula">
+    每笔期望值 = 0.516 × <span class="ok">+$16.5</span> + 0.484 × <span class="highlight">-$64.8</span><br>
+    　　　　　= $8.5 - $31.4<br>
+    　　　　　= <span class="highlight">每笔 -$22.9</span>
+  </div>
+
+  <hr class="divider">
+
+  <div class="problem-title">❌ 必须规避</div>
+  <div class="problem">
+    <div class="problem-icon">①</div>
+    <div class="problem-text"><strong>亏损死扛</strong> — 账户从未回到正收益，输了一直持有"等回来"，设定硬止损 35%</div>
+  </div>
+  <div class="problem">
+    <div class="problem-icon">②</div>
+    <div class="problem-text"><strong>追涨入场</strong> — 入场偏差高达 28%，总在价格拉升后才买，只用限价单</div>
+  </div>
+  <div class="problem">
+    <div class="problem-icon">③</div>
+    <div class="problem-text"><strong>过早止盈</strong> — 赢了平均才 $16，不到输时的四分之一，让利润跑起来</div>
+  </div>
+
+  <div class="strength-title">✅ 值得发扬</div>
+  <div class="problem">
+    <div class="problem-icon">①</div>
+    <div class="problem-text"><strong>方向感不差</strong> — 51.6% 胜率，选方向是真实优势，要保护并放大它</div>
+  </div>
+  <div class="problem">
+    <div class="problem-icon">②</div>
+    <div class="problem-text"><strong>仓位分散</strong> — 单仓最高 3%，没有集中爆仓风险，继续保持</div>
+  </div>
+
+  <div class="bottom">
+    数据来源：Polymarket CLOB API · 分析框架：@thejayden<br>
+    <a href="https://polymarket.com/?r=serene77mc-g6kj">polymarket.com</a> · 不构成投资建议
+  </div>
+</div>
+</body>
+</html>
