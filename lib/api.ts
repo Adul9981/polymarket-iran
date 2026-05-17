@@ -53,7 +53,8 @@ export interface ProcessedMarket {
 
 export async function fetchIranEvents(): Promise<GammaEvent[]> {
   const url = `https://gamma-api.polymarket.com/events?active=true&closed=false&archived=false&tag_slug=iran&limit=100&order=volume24hr&ascending=false`
-  const res = await fetch(url, { next: { revalidate: 1800 } })
+  // revalidate: 600 = 每10分钟刷新一次
+  const res = await fetch(url, { cache: 'no-store' })
   if (!res.ok) return []
   const data = await res.json()
   return data
